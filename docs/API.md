@@ -96,4 +96,4 @@ A quiz submission contains `quizId` and an `answers` array of `questionId` / `op
 
 ## Errors
 
-The application distinguishes invalid or expired authentication, forbidden actions, validation failures, and infrastructure failures. Frontend loaders provide retry controls and avoid treating a failed request as a successful empty result. Existing controllers are the authoritative source for request validation and operation-specific behavior; this reference is not an OpenAPI specification.
+The application distinguishes invalid or expired authentication, forbidden actions, validation failures, and infrastructure failures. Frontend loaders provide retry controls and avoid treating a failed request as a successful empty result. Existing controllers are the authoritative source for request validation and operation-specific behavior.

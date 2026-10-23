@@ -9,7 +9,7 @@
 | Auth Service | Accounts, password hashes, roles, enabled status, token creation | Spring Security, JPA, `auth_db` |
 | Dispute Service | Case lifecycle, assignment, evidence metadata, postings, alerts, training, reports | JPA, `dispute_db`, filesystem |
 
-The backend modules are independent Maven applications. The current architecture has no service registry, message broker, distributed transaction coordinator, or blockchain node.
+The backend modules are independent Maven applications that communicate synchronously over HTTP.
 
 ## Request lifecycle
 

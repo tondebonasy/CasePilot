@@ -36,7 +36,7 @@ Activity and audit records support operational traceability. They are ordinary a
 
 The client-side case export protects formula-like prefixes; server-side CSV exporters should receive a separate review for spreadsheet injection and sensitive-data handling before external distribution. Reporting currently aggregates records in application memory.
 
-Network submission references and financial postings are internal records. A real deployment would require authenticated network/core-banking adapters, delivery guarantees, reconciliation, idempotency, and failure recovery. Rule-based fraud flags are not a trained prediction model.
+Network submission references and financial postings are internal records. A real deployment would require authenticated network/core-banking adapters, delivery guarantees, reconciliation, idempotency, and failure recovery. Fraud flags are computed from deterministic rules.
 
 ## Verification before operational use
 

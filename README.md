@@ -145,5 +145,3 @@ The dispute-service suite covers deadline calculation, workflow rules, evidence 
 ## Integration boundaries
 
 CasePilot records dispute operations; it does not connect to a live card-network submission API or a bank's core ledger. Submission references, financial postings, and notifications are application records. Fraud flags use deterministic rules. Scheme deadlines and reason mappings require validation against the rules adopted by a deploying bank.
-
-The implemented client is a web application. This repository does not contain a native mobile application or a blockchain integration.
