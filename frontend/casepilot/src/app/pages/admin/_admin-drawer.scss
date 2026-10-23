@@ -1,0 +1,196 @@
+@use 'app/theme' as theme;
+
+.admin-drawer-layout {
+  position: relative;
+  border-radius: theme.radius(lg);
+  overflow: hidden;
+  background:
+    radial-gradient(220px 110px at 100% 0%, rgba(214, 179, 84, 0.14), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(248, 251, 255, 0.94));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+
+  &.mat-drawer-container {
+    overflow: visible;
+  }
+
+  .mat-drawer-content {
+    background: transparent;
+  }
+
+  ::ng-deep .mat-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.36);
+    backdrop-filter: blur(4px);
+  }
+}
+
+.manager-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: theme.space(md);
+  padding: theme.space(lg);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  background:
+    linear-gradient(90deg, rgba(15, 76, 58, 0.04), rgba(214, 179, 84, 0.08), rgba(255, 255, 255, 0.7));
+}
+
+.manager-heading {
+  display: flex;
+  flex-direction: column;
+  gap: theme.space(xxs);
+}
+
+.manager-title {
+  @include theme.apply-typography(h3);
+  margin: 0;
+}
+
+.manager-subtitle {
+  @include theme.apply-typography(small);
+  color: theme.color(neutral-600);
+  margin: 0;
+}
+
+.drawer-launch {
+  min-height: 44px;
+  border-radius: theme.radius(full);
+  box-shadow: 0 12px 24px rgba(15, 76, 58, 0.12);
+
+  .mat-icon {
+    margin-right: theme.space(xs);
+  }
+}
+
+.admin-drawer-panel {
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(640px, 94vw);
+  max-width: 94vw;
+  height: 100vh;
+  border-left: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 28px 0 0 28px;
+  background:
+    radial-gradient(240px 140px at 100% 0%, rgba(214, 179, 84, 0.18), transparent 70%),
+    linear-gradient(180deg, #fcfbf7 0%, #f3f7f4 100%);
+  box-shadow: -24px 0 48px rgba(15, 23, 42, 0.18);
+  z-index: 1001;
+}
+
+.admin-drawer-scroll {
+  height: 100%;
+  overflow: auto;
+}
+
+.admin-drawer-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: theme.space(xl);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(244, 250, 247, 0.96));
+  backdrop-filter: blur(10px);
+}
+
+.admin-drawer-overline {
+  display: inline-flex;
+  align-items: center;
+  gap: theme.space(xxs);
+  margin-bottom: theme.space(sm);
+  padding: 6px 10px;
+  border-radius: theme.radius(full);
+  background: rgba(15, 76, 58, 0.08);
+  color: #0f4c3a;
+  font-size: 0.72rem;
+  font-weight: theme.$font-weight-bold;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+}
+
+.admin-drawer-title {
+  @include theme.apply-typography(h2);
+  margin: 0 0 theme.space(xxs);
+}
+
+.admin-drawer-subtitle {
+  @include theme.apply-typography(body);
+  color: theme.color(neutral-600);
+  margin: 0;
+  max-width: 34ch;
+}
+
+.admin-drawer-form {
+  display: flex;
+  flex-direction: column;
+  gap: theme.space(md);
+  padding: theme.space(xl);
+}
+
+.admin-drawer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: theme.space(md);
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-drawer-divider {
+  height: 1px;
+  margin: theme.space(xs) 0;
+  background: linear-gradient(90deg, rgba(15, 76, 58, 0.1), rgba(214, 179, 84, 0.18), rgba(15, 23, 42, 0.06));
+}
+
+.admin-drawer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: theme.space(md);
+  margin-top: theme.space(sm);
+  padding-top: theme.space(md);
+}
+
+.admin-drawer-actions-group {
+  display: flex;
+  align-items: center;
+  gap: theme.space(sm);
+  flex-wrap: wrap;
+}
+
+.admin-drawer-note {
+  padding: theme.space(sm) theme.space(md);
+  border-radius: theme.radius(md);
+  background: rgba(15, 76, 58, 0.06);
+  color: theme.color(neutral-700);
+  font-size: theme.font-size(small);
+  line-height: 1.5;
+}
+
+.admin-drawer-message {
+  padding: theme.space(sm) theme.space(md);
+  border-radius: theme.radius(md);
+  font-size: theme.font-size(small);
+  font-weight: theme.$font-weight-medium;
+
+  &.success {
+    background-color: theme.color(success-light);
+    color: theme.color(success-dark);
+  }
+
+  &.error {
+    background-color: theme.color(error-light);
+    color: theme.color(error-dark);
+  }
+}
+
+@media (min-width: 1400px) {
+  .admin-drawer-panel {
+    width: min(760px, 92vw);
+  }
+}

@@ -1,0 +1,112 @@
+@use 'app/theme' as theme;
+@import 'app/pages/admin/admin-drawer';
+
+.widget-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: theme.radius(lg);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0f4c3a 0%, #d6b354 100%);
+    opacity: 0.35;
+  }
+}
+
+.table-widget .widget-content {
+  padding: 0;
+}
+
+.table-message {
+  margin: theme.space(md);
+}
+
+.form-message {
+  padding: theme.space(sm) theme.space(md);
+  border-radius: theme.radius(md);
+  font-size: theme.font-size(small);
+  font-weight: theme.$font-weight-medium;
+
+  &.success {
+    background-color: theme.color(success-light);
+    color: theme.color(success-dark);
+  }
+
+  &.error {
+    background-color: theme.color(error-light);
+    color: theme.color(error-dark);
+  }
+}
+
+.disputes-table {
+  width: 100%;
+
+  .mat-mdc-header-cell {
+    @include theme.apply-typography(label);
+    color: theme.color(neutral-700);
+    background-color: theme.color(neutral-100);
+    padding: theme.space(sm) theme.space(lg);
+  }
+
+  .mat-mdc-cell {
+    @include theme.apply-typography(body);
+    border-bottom-color: theme.color(neutral-200);
+    padding: theme.space(sm) theme.space(lg);
+  }
+
+  .mat-column-name { min-width: 180px; }
+  .mat-column-email { min-width: 240px; }
+  .mat-column-role { min-width: 200px; }
+  .mat-column-status { width: 140px; }
+  .mat-column-actions { width: 160px; }
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: theme.radius(full);
+  font-size: 0.8rem;
+  background-color: theme.color(neutral-200);
+  color: theme.color(neutral-700);
+
+  &.enabled {
+    background-color: theme.color(success-light);
+    color: theme.color(success-dark);
+  }
+}
+
+.empty-state {
+  padding: theme.space(xl);
+  text-align: center;
+  color: theme.color(neutral-600);
+}
+
+.skeleton-table {
+  padding: theme.space(lg);
+
+  .skeleton-row {
+    height: 53px;
+    margin-bottom: theme.space(sm);
+    border-radius: theme.radius(md);
+    animation: shimmer 1.2s linear infinite;
+    background: #f6f7f8;
+    background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+
+    &.header {
+      height: 40px;
+      background-color: theme.color(neutral-100);
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}

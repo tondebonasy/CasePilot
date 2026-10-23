@@ -1,0 +1,339 @@
+<header class="page-header">
+  <div class="page-header__content">
+    <div class="page-header__badge">
+      <mat-icon>dashboard</mat-icon>
+    </div>
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">A real-time operations view across dispute volume, SLA pressure, fraud signals, and active queues.</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button mat-stroked-button color="primary" (click)="exportCsv()">
+      <mat-icon>download</mat-icon>
+      Export CSV
+    </button>
+    <button mat-stroked-button color="primary" (click)="exportBankCsv()">
+      <mat-icon>receipt_long</mat-icon>
+      Export Bank CSV
+    </button>
+  </div>
+</header>
+
+<div *ngIf="metricsError" class="form-message error" role="alert">
+  <span>{{ metricsError }}</span>
+  <button mat-stroked-button type="button" (click)="loadMetrics()">Retry</button>
+</div>
+<section class="overview-hero" *ngIf="!loading; else heroSkeleton">
+  <div class="hero-primary">
+    <div class="hero-overline">Dispute Control Center</div>
+    <h2 class="hero-title">Operational posture at a glance</h2>
+    <p class="hero-copy">
+      {{ (m?.openDisputes ?? 0) > 0
+        ? 'Open disputes are live in the system and should be tracked against internal due dates and scheme windows.'
+        : 'No open disputes are currently waiting in the workflow.' }}
+    </p>
+
+    <div class="hero-stat-row">
+      <div class="hero-stat">
+        <span class="hero-stat-label">Open Exposure</span>
+        <strong class="hero-stat-value">{{ m?.openDisputes ?? 0 }}</strong>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-label">Current Win Rate</span>
+        <strong class="hero-stat-value">{{ ((m?.winRate ?? 0) * 100) | number:'1.0-0' }}%</strong>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-label">Top Cause</span>
+        <strong class="hero-stat-value">{{ m?.topCauses?.length ? m.topCauses[0].label : 'No data yet' }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-sidecard">
+    <div class="hero-sidecard__header">
+      <span class="hero-chip" data-tone="alert">Risk Pulse</span>
+      <span class="hero-sidecard__caption">Today</span>
+    </div>
+
+    <div class="pulse-metric">
+      <span>Overdue Cases</span>
+      <strong>{{ m?.overdueDisputes ?? 0 }}</strong>
+    </div>
+    <div class="pulse-metric">
+      <span>SLA Breaches</span>
+      <strong>{{ m?.slaBreaches ?? 0 }}</strong>
+    </div>
+    <div class="pulse-metric">
+      <span>Fraud Flags</span>
+      <strong>{{ m?.fraudFlagCount ?? 0 }}</strong>
+    </div>
+  </div>
+</section>
+
+<div class="dashboard-grid">
+  <section class="kpi-grid card-stagger">
+    <ng-container *ngIf="!loading; else kpiSkeleton">
+      <article class="kpi-card" data-tone="volume">
+        <div class="kpi-topline">
+          <div class="kpi-icon-shell"><mat-icon class="kpi-icon color-blue">folder_copy</mat-icon></div>
+          <span class="kpi-chip">Portfolio</span>
+        </div>
+        <p class="kpi-title">Total Disputes</p>
+        <p class="kpi-value">{{ m?.totalDisputes ?? '0' }}</p>
+        <p class="kpi-footnote">All cases recorded in the reporting window.</p>
+      </article>
+
+      <article class="kpi-card" data-tone="active">
+        <div class="kpi-topline">
+          <div class="kpi-icon-shell"><mat-icon class="kpi-icon color-orange">hourglass_top</mat-icon></div>
+          <span class="kpi-chip">In Progress</span>
+        </div>
+        <p class="kpi-title">Open Disputes</p>
+        <p class="kpi-value">{{ m?.openDisputes ?? '0' }}</p>
+        <p class="kpi-footnote">Cases still moving through review and resolution.</p>
+      </article>
+
+      <article class="kpi-card" data-tone="danger">
+        <div class="kpi-topline">
+          <div class="kpi-icon-shell"><mat-icon class="kpi-icon color-red">error_outline</mat-icon></div>
+          <span class="kpi-chip">Attention</span>
+        </div>
+        <p class="kpi-title">Overdue Risk</p>
+        <p class="kpi-value">{{ m?.overdueDisputes ?? '0' }}</p>
+        <p class="kpi-footnote">Open cases that have crossed the internal due date.</p>
+      </article>
+
+      <article class="kpi-card" data-tone="success">
+        <div class="kpi-topline">
+          <div class="kpi-icon-shell"><mat-icon class="kpi-icon color-green">check_circle_outline</mat-icon></div>
+          <span class="kpi-chip">Outcome</span>
+        </div>
+        <p class="kpi-title">Win Rate</p>
+        <p class="kpi-value">{{ ((m?.winRate ?? 0) * 100) | number:'1.0-0' }}%</p>
+        <p class="kpi-footnote">Resolved cases won in favor of the customer.</p>
+      </article>
+
+      <article class="kpi-card" data-tone="danger">
+        <div class="kpi-topline">
+          <div class="kpi-icon-shell"><mat-icon class="kpi-icon color-red">gpp_maybe</mat-icon></div>
+          <span class="kpi-chip">Compliance</span>
+        </div>
+        <p class="kpi-title">SLA Breaches</p>
+        <p class="kpi-value">{{ m?.slaBreaches ?? '0' }}</p>
+        <p class="kpi-footnote">Cases marked as having breached deadline controls.</p>
+      </article>
+
+      <article class="kpi-card" data-tone="fraud">
+        <div class="kpi-topline">
+          <div class="kpi-icon-shell"><mat-icon class="kpi-icon color-orange">report</mat-icon></div>
+          <span class="kpi-chip">Fraud</span>
+        </div>
+        <p class="kpi-title">Fraud Flags</p>
+        <p class="kpi-value">{{ m?.fraudFlagCount ?? '0' }}</p>
+        <p class="kpi-footnote">Detected signals requiring additional scrutiny.</p>
+      </article>
+    </ng-container>
+  </section>
+
+  <section class="widget-grid card-stagger">
+    <article class="widget-card widget-card--wide">
+      <div class="widget-header">
+        <div>
+          <h2 class="widget-title">Top Dispute Causes</h2>
+          <p class="widget-subtitle">Ranking of the most frequent dispute reasons in the current metrics view.</p>
+        </div>
+        <span class="section-chip">Cause Mix</span>
+      </div>
+      <div class="widget-content">
+        <ng-container *ngIf="!loading; else listSkeleton">
+          <ul class="ranked-list ranked-list--causes" *ngIf="m?.topCauses?.length; else noCausesEmptyState">
+            <li *ngFor="let cause of m.topCauses; let i = index" class="ranked-list-item">
+              <div class="cause-main">
+                <span class="cause-rank">0{{ i + 1 }}</span>
+                <span class="list-item-label">{{ cause.label }}</span>
+              </div>
+              <span class="list-item-value">{{ cause.count }}</span>
+            </li>
+          </ul>
+        </ng-container>
+      </div>
+    </article>
+
+    <article class="widget-card">
+      <div class="widget-header">
+        <div>
+          <h2 class="widget-title">Performance Snapshot</h2>
+          <p class="widget-subtitle">Resolution speed, loss exposure, and overdue drag.</p>
+        </div>
+        <span class="section-chip">Operations</span>
+      </div>
+      <div class="widget-content">
+        <ng-container *ngIf="!loading; else kpiListSkeleton">
+          <ul class="kpi-list">
+            <li>
+              <span>Avg. Resolution Time</span>
+              <strong>{{ (m?.avgResolutionHours ?? 0) | number:'1.0-0' }}h</strong>
+            </li>
+            <li>
+              <span>Loss Rate</span>
+              <strong>{{ ((m?.lossRate ?? 0) * 100) | number:'1.0-0' }}%</strong>
+            </li>
+            <li>
+              <span>Overdue Loss Rate</span>
+              <strong>{{ ((m?.overdueLossRate ?? 0) * 100) | number:'1.0-0' }}%</strong>
+            </li>
+            <li>
+              <span>Avg. Overdue (Open)</span>
+              <strong>{{ (m?.avgOverdueHours ?? 0) | number:'1.0-0' }}h</strong>
+            </li>
+            <li>
+              <span>Avg. Late Closure</span>
+              <strong>{{ (m?.avgOverdueClosureHours ?? 0) | number:'1.0-0' }}h</strong>
+            </li>
+          </ul>
+        </ng-container>
+      </div>
+    </article>
+  </section>
+</div>
+
+<section class="queue-section" *ngIf="showWorkQueue()">
+  <div class="queue-section__heading">
+    <div>
+      <h2 class="queue-section__title">Work Queue</h2>
+      <p class="queue-section__subtitle">Assigned items and available queue inventory for your role.</p>
+    </div>
+    <span class="section-chip">Live Queue</span>
+  </div>
+
+  <div class="queue-grid card-stagger">
+    <article class="widget-card">
+      <div class="widget-header">
+        <div>
+          <h2 class="widget-title">My Tasks</h2>
+          <p class="widget-subtitle">Cases already assigned to you.</p>
+        </div>
+      </div>
+      <div class="widget-content">
+        <ng-container *ngIf="!queueLoading; else queueSkeleton">
+          <ng-container *ngIf="!queueError; else queueErrorState">
+            <div class="queue-list" *ngIf="tasks.length; else noTasks">
+              <div class="queue-item" *ngFor="let item of tasks">
+                <div class="queue-main">
+                  <span class="queue-case">#{{ item.caseCode }}</span>
+                  <span class="queue-merchant">{{ item.merchantName }}</span>
+                </div>
+                <div class="queue-meta">
+                  <span class="queue-status" [attr.data-status]="item.status">
+                    <mat-icon class="status-icon">{{ statusIcon(item.status) }}</mat-icon>
+                    {{ label(item.status) }}
+                  </span>
+                  <span class="queue-date">{{ item.dueAt | date:'mediumDate' }}</span>
+                  <a mat-stroked-button color="primary" [routerLink]="['/disputes', item.id]">Open</a>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </article>
+
+    <article class="widget-card">
+      <div class="widget-header">
+        <div>
+          <h2 class="widget-title">Role Queue</h2>
+          <p class="widget-subtitle">Unassigned cases waiting for your role to claim.</p>
+        </div>
+      </div>
+      <div class="widget-content">
+        <ng-container *ngIf="!queueLoading; else queueSkeleton">
+          <ng-container *ngIf="!queueError; else queueErrorState">
+            <div class="queue-list" *ngIf="queue.length; else noQueue">
+              <div class="queue-item" *ngFor="let item of queue">
+                <div class="queue-main">
+                  <span class="queue-case">#{{ item.caseCode }}</span>
+                  <span class="queue-merchant">{{ item.merchantName }}</span>
+                </div>
+                <div class="queue-meta">
+                  <span class="queue-status" [attr.data-status]="item.status">
+                    <mat-icon class="status-icon">{{ statusIcon(item.status) }}</mat-icon>
+                    {{ label(item.status) }}
+                  </span>
+                  <span class="queue-date">{{ item.dueAt | date:'mediumDate' }}</span>
+                  <button mat-flat-button color="primary" (click)="claimCase(item.id)">Claim</button>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </article>
+  </div>
+</section>
+
+<ng-template #heroSkeleton>
+  <section class="overview-hero overview-hero--loading">
+    <div class="hero-primary skeleton hero-skeleton-block"></div>
+    <div class="hero-sidecard skeleton hero-skeleton-side"></div>
+  </section>
+</ng-template>
+
+<ng-template #kpiSkeleton>
+  <div class="kpi-card skeleton"></div>
+  <div class="kpi-card skeleton"></div>
+  <div class="kpi-card skeleton"></div>
+  <div class="kpi-card skeleton"></div>
+</ng-template>
+
+<ng-template #listSkeleton>
+  <div class="skeleton-list">
+    <div class="skeleton-list-item"></div>
+    <div class="skeleton-list-item"></div>
+    <div class="skeleton-list-item"></div>
+  </div>
+</ng-template>
+
+<ng-template #kpiListSkeleton>
+  <div class="skeleton-list">
+    <div class="skeleton-list-item"></div>
+    <div class="skeleton-list-item"></div>
+    <div class="skeleton-list-item"></div>
+  </div>
+</ng-template>
+
+<ng-template #noCausesEmptyState>
+  <div class="empty-state">
+    <mat-icon class="empty-state-icon">bar_chart</mat-icon>
+    <h3 class="empty-state-title">No Dispute Data Yet</h3>
+    <p class="empty-state-message">As disputes are processed, this panel will show the most common reason drivers.</p>
+  </div>
+</ng-template>
+
+<ng-template #queueSkeleton>
+  <div class="skeleton-list">
+    <div class="skeleton-list-item"></div>
+    <div class="skeleton-list-item"></div>
+    <div class="skeleton-list-item"></div>
+  </div>
+</ng-template>
+
+<ng-template #queueErrorState>
+  <div class="empty-state">{{ queueError }}</div>
+</ng-template>
+
+<ng-template #noTasks>
+  <div class="empty-state">
+    <mat-icon class="empty-state-icon">task_alt</mat-icon>
+    <h3 class="empty-state-title">No Assigned Cases</h3>
+    <p class="empty-state-message">Cases assigned directly to you will appear here.</p>
+  </div>
+</ng-template>
+
+<ng-template #noQueue>
+  <div class="empty-state">
+    <mat-icon class="empty-state-icon">inbox</mat-icon>
+    <h3 class="empty-state-title">Role Queue Empty</h3>
+    <p class="empty-state-message">There are no unassigned cases waiting for your role right now.</p>
+  </div>
+</ng-template>

@@ -1,0 +1,138 @@
+<mat-drawer-container class="admin-drawer-layout card-stagger" autosize>
+  <mat-drawer-content>
+    <div class="widget-card list-widget">
+      <div class="manager-toolbar">
+        <div class="manager-heading">
+          <h2 class="manager-title">Existing Quizzes</h2>
+          <p class="manager-subtitle">Build awareness assessments tied to active Bank policies.</p>
+        </div>
+        <button mat-flat-button color="primary" class="drawer-launch" type="button" (click)="openCreateDrawer()">
+          <mat-icon>quiz</mat-icon>
+          New Quiz
+        </button>
+      </div>
+
+      <div class="widget-content">
+        <div *ngIf="quizMessage" class="form-message success table-message">{{ quizMessage }}</div>
+        <div *ngIf="quizError" class="form-message error table-message"><span>{{ quizError }}</span>
+          <button *ngIf="loadFailed" mat-stroked-button type="button" (click)="loadData()" [disabled]="loading">Retry</button></div>
+
+        <ng-container *ngIf="!loading; else skeleton">
+          <ul class="quiz-list" *ngIf="quizzes.length > 0; else emptyState">
+            <li *ngFor="let quiz of quizzes" class="quiz-item">
+              <h3 class="quiz-title">{{ quiz.title }}</h3>
+              <p class="quiz-meta">
+                <span>Policy: {{ policyTitle(quiz.policyId) }}</span> -
+                <span>{{ quiz.questions.length }} Question(s)</span>
+              </p>
+              <p class="quiz-desc">{{ quiz.description }}</p>
+            </li>
+          </ul>
+        </ng-container>
+
+        <ng-template #skeleton>
+          <div class="skeleton-list">
+            <div class="skeleton-item"></div>
+          </div>
+        </ng-template>
+
+        <ng-template #emptyState>
+          <div class="empty-state" *ngIf="!loadFailed">
+            <mat-icon class="empty-state-icon">quiz</mat-icon>
+            <h3 class="empty-state-title">No Quizzes Yet</h3>
+            <p class="empty-state-message">Create a quiz to assess staff awareness of Bank policies.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </mat-drawer-content>
+
+  <mat-drawer class="admin-drawer-panel quiz-drawer" position="end" mode="over" [opened]="drawerOpen" (closedStart)="closeDrawer()">
+    <div class="admin-drawer-scroll">
+      <div class="admin-drawer-header">
+        <div class="admin-drawer-overline">
+          <mat-icon>school</mat-icon>
+          <span>Quiz Builder</span>
+        </div>
+        <h2 class="admin-drawer-title">Create Training Quiz</h2>
+        <p class="admin-drawer-subtitle">Assemble policy-linked questions, answer options, and explanations in one structured drawer.</p>
+      </div>
+
+      <form [formGroup]="quizForm" (ngSubmit)="submitQuiz()" class="admin-drawer-form">
+        <div class="admin-drawer-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Policy</mat-label>
+            <mat-select formControlName="policyId">
+              <mat-option *ngFor="let policy of policies" [value]="policy.id">{{ policy.title }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Quiz Title</mat-label>
+            <input matInput formControlName="title" />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="2"></textarea>
+        </mat-form-field>
+
+        <div *ngIf="policyWarning" class="admin-drawer-message error">{{ policyWarning }}</div>
+        <div class="admin-drawer-divider"></div>
+
+        <div formArrayName="questions" class="questions-array">
+          <div *ngFor="let questionCtrl of questionControls.controls; let qi = index" [formGroupName]="qi" class="question-group">
+            <header class="question-header">
+              <h3>Question {{ qi + 1 }}</h3>
+              <button mat-icon-button color="warn" type="button" (click)="removeQuestion(qi)" [disabled]="questionControls.length <= 1" aria-label="Remove question">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </header>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Question Text</mat-label>
+              <textarea matInput formControlName="question" rows="2"></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Explanation</mat-label>
+              <textarea matInput formControlName="explanation" rows="2" placeholder="Explain why the correct answer is right."></textarea>
+            </mat-form-field>
+
+            <div formArrayName="options" class="options-array">
+              <h4 class="options-title">Options</h4>
+              <div *ngFor="let optionCtrl of questionOptions(qi).controls; let oi = index" [formGroupName]="oi" class="option-item">
+                <mat-form-field appearance="outline">
+                  <mat-label>Option {{ oi + 1 }}</mat-label>
+                  <input matInput formControlName="text" />
+                </mat-form-field>
+                <mat-checkbox formControlName="correct">Correct</mat-checkbox>
+                <button mat-icon-button type="button" (click)="removeOption(qi, oi)" [disabled]="questionOptions(qi).length <= 2" aria-label="Remove option">
+                  <mat-icon>remove_circle_outline</mat-icon>
+                </button>
+              </div>
+              <button mat-stroked-button type="button" (click)="addOption(qi)" class="add-option-btn">
+                <mat-icon>add</mat-icon>
+                Add Option
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="quizMessage" class="admin-drawer-message success">{{ quizMessage }}</div>
+        <div *ngIf="quizError" class="admin-drawer-message error">{{ quizError }}</div>
+
+        <div class="admin-drawer-actions">
+          <button mat-stroked-button type="button" (click)="addQuestion()" class="add-question-btn">
+            <mat-icon>add</mat-icon>
+            Add Another Question
+          </button>
+          <div class="admin-drawer-actions-group">
+            <button mat-button type="button" (click)="closeDrawer()">Cancel</button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="quizForm.invalid || submittingQuiz">Create Quiz</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </mat-drawer>
+</mat-drawer-container>

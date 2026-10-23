@@ -1,0 +1,125 @@
+@use 'app/theme' as theme;
+@import 'app/pages/admin/admin-drawer';
+
+.widget-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: theme.radius(lg);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0f4c3a 0%, #d6b354 100%);
+    opacity: 0.35;
+  }
+}
+
+.list-widget .widget-content {
+  padding: theme.space(sm);
+}
+
+.table-message {
+  margin: theme.space(md);
+}
+
+.form-checkbox {
+  margin: theme.space(xs) 0;
+}
+
+.form-message {
+  padding: theme.space(sm) theme.space(md);
+  border-radius: theme.radius(md);
+  font-size: theme.font-size(small);
+  font-weight: theme.$font-weight-medium;
+
+  &.success {
+    background-color: theme.color(success-light);
+    color: theme.color(success-dark);
+  }
+
+  &.error {
+    background-color: theme.color(error-light);
+    color: theme.color(error-dark);
+  }
+}
+
+.policy-list {
+  list-style: none;
+}
+
+.policy-item {
+  padding: theme.space(lg);
+  border: 1px solid theme.color(neutral-200);
+  border-radius: theme.radius(md);
+  display: flex;
+  justify-content: space-between;
+  gap: theme.space(lg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 251, 255, 0.98));
+
+  &:not(:last-child) {
+    margin-bottom: theme.space(md);
+  }
+}
+
+.policy-title {
+  @include theme.apply-typography(h3);
+  margin-bottom: theme.space(xxs);
+}
+
+.policy-meta {
+  @include theme.apply-typography(small);
+  color: theme.color(neutral-600);
+  margin-bottom: theme.space(sm);
+}
+
+.policy-summary {
+  @include theme.apply-typography(body);
+  color: theme.color(neutral-700);
+}
+
+.policy-actions {
+  display: flex;
+  flex-direction: column;
+  gap: theme.space(sm);
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.status-tag {
+  font-size: 0.8rem;
+  font-weight: theme.$font-weight-bold;
+  padding: 2px 8px;
+  border-radius: theme.radius(full);
+  background-color: theme.color(neutral-200);
+  color: theme.color(neutral-700);
+
+  &.active {
+    background-color: theme.color(success-light);
+    color: theme.color(success-dark);
+  }
+}
+
+.skeleton-list .skeleton-item {
+  height: 150px;
+  margin-bottom: theme.space(md);
+  border-radius: theme.radius(lg);
+  animation: shimmer 1.2s linear infinite;
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+}
+
+.empty-state {
+  padding: theme.space(xl);
+  text-align: center;
+  color: theme.color(neutral-600);
+}
+
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}

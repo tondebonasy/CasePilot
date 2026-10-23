@@ -1,0 +1,17 @@
+@use 'app/theme' as theme;
+
+@import 'app/pages/admin/sla-manager.component.scss';
+
+.widget-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: theme.space(lg);
+}
+
+.detail-cell {
+    max-width: 360px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

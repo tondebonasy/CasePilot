@@ -1,0 +1,92 @@
+<div class="quiz-container">
+    <ng-container *ngIf="!loading && quiz; else loaderOrError">
+
+
+        <ng-container *ngIf="!result">
+
+            <header class="quiz-header">
+                <a routerLink="/training" mat-button><mat-icon>arrow_back</mat-icon> Back to Trainings</a>
+                <h1>{{ quiz.title }}</h1>
+                <p>{{ quiz.description }}</p>
+            </header>
+
+
+            <div class="progress-container">
+                <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+                <span class="progress-label">{{ currentQuestionIndex + 1 }} / {{ quiz.questions.length }}</span>
+            </div>
+
+
+            <div class="question-area">
+                <div *ngFor="let q of quiz.questions; let i = index" [hidden]="i !== currentQuestionIndex">
+                    <h2 class="question-text">{{ q.question }}</h2>
+                    <mat-radio-group class="options-group"
+                                     [value]="answers[q.id]"
+                                     (change)="selectAnswer(q.id, $event.value)">
+                        <mat-radio-button *ngFor="let opt of q.options" [value]="opt.id" class="option">
+                            {{ opt.text }}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </div>
+
+
+            <footer class="quiz-footer">
+                <button mat-stroked-button (click)="prevQuestion()" [disabled]="currentQuestionIndex === 0">
+                    <mat-icon>navigate_before</mat-icon>
+                    <span>Previous</span>
+                </button>
+
+                <button *ngIf="currentQuestionIndex < quiz.questions.length - 1"
+                        mat-flat-button color="primary"
+                        (click)="nextQuestion()"
+                        [disabled]="!isAnswered(quiz.questions[currentQuestionIndex].id)">
+                    <span>Next</span>
+                    <mat-icon>navigate_next</mat-icon>
+                </button>
+
+                <button *ngIf="currentQuestionIndex === quiz.questions.length - 1"
+                        mat-flat-button color="primary"
+                        [disabled]="!allQuestionsAnswered() || submitting"
+                        (click)="submitQuiz()">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>{{ submitting ? 'Submitting...' : 'Finish & See Results' }}</span>
+                </button>
+            </footer>
+        </ng-container>
+
+
+        <ng-container *ngIf="result">
+            <div class="results-card">
+                <div class="results-header" [class.pass]="resultPercentage >= 80" [class.fail]="resultPercentage < 80">
+                    <mat-icon>{{ resultPercentage >= 80 ? 'task_alt' : 'error' }}</mat-icon>
+                    <h2>{{ resultPercentage >= 80 ? 'Quiz Passed!' : 'Needs Improvement' }}</h2>
+                </div>
+
+                <div class="results-content">
+                    <p class="score">Your Score: <strong>{{ result.score }} / {{ result.maxScore }} ({{ resultPercentage | number:'1.0-0' }}%)</strong></p>
+
+                    <div *ngIf="result.weaknesses?.length > 0" class="weaknesses">
+                        <h3>Areas for Improvement</h3>
+                        <ul>
+                            <li *ngFor="let w of result.weaknesses">
+                                <h4>{{ w.question }}</h4>
+                                <p>{{ w.explanation }}</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="results-footer">
+                        <a routerLink="/training" mat-flat-button color="primary">Back to All Trainings</a>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+    </ng-container>
+</div>
+
+<ng-template #loaderOrError>
+    <div *ngIf="loading" class="centered-state">Loading Quiz...</div>
+    <div *ngIf="error" class="centered-state error-state">{{ error }}</div>
+</ng-template>

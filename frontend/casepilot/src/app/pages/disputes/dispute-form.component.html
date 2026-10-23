@@ -1,0 +1,168 @@
+<div class="dialog-header">
+  <div class="dialog-title">
+    <div class="dialog-badge">
+      <mat-icon>gavel</mat-icon>
+    </div>
+    <div>
+      <h1 mat-dialog-title>Create New Dispute</h1>
+      <p mat-dialog-subtitle>Enter the transaction details below to initiate a new dispute case.</p>
+    </div>
+  </div>
+  <button mat-icon-button class="close-button" (click)="close()" aria-label="Close dialog">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-divider class="dialog-divider"></mat-divider>
+
+<form [formGroup]="form" (ngSubmit)="create()">
+  <mat-dialog-content class="dialog-content">
+    <div class="form-hero-note">
+      <mat-icon>info</mat-icon>
+      <div>
+        <strong>Use the real transaction details.</strong>
+        The system will check eligibility first. If the case qualifies, it moves into the dispute flow. If it does not qualify, it is marked <strong>Ineligible</strong> and does not continue to the next stage.
+      </div>
+    </div>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-title">
+          <mat-icon>receipt_long</mat-icon>
+          <h3>Transaction Details</h3>
+        </div>
+        <p>Capture the transaction reference, date, and amount.</p>
+      </div>
+      <div class="form-grid">
+
+        <div class="form-column">
+          <mat-form-field appearance="outline">
+            <mat-label>Transaction Reference</mat-label>
+            <input matInput formControlName="transactionRef" placeholder="Example: TXN-2026-000184" />
+            <mat-hint>Use the bank or switch transaction reference.</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>RRN</mat-label>
+            <input matInput formControlName="rrn" placeholder="Example: 240329102455" />
+            <mat-hint>Retrieval reference number from the card network.</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Authorization Code</mat-label>
+            <input matInput formControlName="authCode" placeholder="Example: 4F8K21" />
+            <mat-hint>The approval code used on the original transaction.</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Transaction Date</mat-label>
+            <input matInput [matDatepicker]="txDatePicker" formControlName="txDate" placeholder="Select transaction date" />
+            <mat-datepicker-toggle matIconSuffix [for]="txDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #txDatePicker></mat-datepicker>
+            <mat-hint>Pick the original transaction date from the calendar.</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Amount</mat-label>
+            <input matInput type="number" formControlName="amount" step="0.01" placeholder="Example: 125.50" />
+            <mat-hint>Use the disputed amount only.</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Currency</mat-label>
+            <input matInput formControlName="currency" placeholder="Example: USD" />
+            <mat-hint>Common values: USD, ZWG, ZAR.</mat-hint>
+          </mat-form-field>
+        </div>
+
+
+        <div class="form-column">
+          <mat-form-field appearance="outline">
+            <mat-label>Merchant Name</mat-label>
+            <input matInput formControlName="merchantName" placeholder="Example: ABC Electronics" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Merchant ID</mat-label>
+            <input matInput formControlName="merchantId" placeholder="Example: MER-77821" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Customer Identifier</mat-label>
+            <input matInput formControlName="customerIdentifier" placeholder="Example: CUST-100245 or national ID" />
+            <mat-hint>Use the bank customer number or another approved identifier.</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Card Last 4 Digits</mat-label>
+            <input matInput formControlName="cardLast4" placeholder="1234" maxlength="4" />
+            <mat-hint>Only the last 4 digits are needed.</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+              <mat-label>Card Network</mat-label>
+              <mat-select formControlName="network">
+                <mat-option *ngFor="let net of networks" [value]="net">{{ net }}</mat-option>
+              </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Terminal ID</mat-label>
+            <input matInput formControlName="terminalId" placeholder="Example: POS-0042" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Terminal Location</mat-label>
+            <input matInput formControlName="terminalLocation" placeholder="Example: Sam Levy Village, Harare" />
+          </mat-form-field>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-title">
+          <mat-icon>fact_check</mat-icon>
+          <h3>Dispute Information</h3>
+        </div>
+        <p>Describe the dispute type, channel, and narrative.</p>
+      </div>
+      <mat-form-field appearance="outline">
+        <mat-label>Dispute Type</mat-label>
+        <mat-select formControlName="disputeType">
+          <mat-option *ngFor="let type of disputeTypes" [value]="type">{{ type }}</mat-option>
+        </mat-select>
+        <mat-hint>Example: choose Unauthorized for cardholder-denied usage.</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Channel</mat-label>
+        <mat-select formControlName="channel">
+          <mat-option *ngFor="let channel of channels" [value]="channel">{{ channel }}</mat-option>
+        </mat-select>
+        <mat-hint>Example: POS for card present, E-COMMERCE for online payment.</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Reason / Narrative</mat-label>
+        <textarea matInput formControlName="reason" rows="4" placeholder="Example: Customer says card was in their possession in Harare, but the transaction happened online from another location."></textarea>
+        <mat-hint>State what happened in simple, factual language.</mat-hint>
+      </mat-form-field>
+      <div class="form-grid">
+        <div class="form-column">
+          <mat-checkbox formControlName="merchantRefunded">Merchant already refunded</mat-checkbox>
+        </div>
+        <div class="form-column" *ngIf="form.value.merchantRefunded">
+          <mat-form-field appearance="outline">
+            <mat-label>Refund Reference</mat-label>
+            <input matInput formControlName="refundRef" placeholder="Example: RF-88412" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Refund Date</mat-label>
+            <input matInput [matDatepicker]="refundDatePicker" formControlName="refundAt" placeholder="Select refund date" />
+            <mat-datepicker-toggle matIconSuffix [for]="refundDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #refundDatePicker></mat-datepicker>
+            <mat-hint>Pick the date the merchant refund was processed.</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+    </section>
+
+  </mat-dialog-content>
+
+  <mat-divider class="dialog-divider"></mat-divider>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="close()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || creating">
+      {{ creating ? 'Submitting...' : 'Submit Dispute' }}
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -1,0 +1,235 @@
+<ng-container *ngIf="!loading; else skeletonLoader">
+  <div class="page-container" *ngIf="d">
+    <header class="page-header">
+      <div class="header-main">
+        <div class="page-header__badge">
+          <mat-icon>fact_check</mat-icon>
+        </div>
+        <a routerLink="/disputes" mat-icon-button class="back-button" aria-label="Back to disputes list">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="header-title">
+          <h1>Dispute Case #{{ d.caseCode || d.id }}</h1>
+          <p>{{ d.transaction.merchantName }}</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="status-badge" [attr.data-status]="d.status">
+          <mat-icon class="status-icon">{{ statusIcon(d.status) }}</mat-icon>
+          {{ displayStatusLabel() }}
+        </span>
+        <span *ngIf="d.resolutionOutcome" class="status-badge" [attr.data-status]="d.resolutionOutcome">
+          <mat-icon class="status-icon">{{ statusIcon(d.resolutionOutcome) }}</mat-icon>
+          {{ formatLabel(d.resolutionOutcome) }}
+        </span>
+        <span *ngIf="d.overdue" class="status-badge" data-status="OVERDUE">
+          <mat-icon class="status-icon">warning_amber</mat-icon>
+          Overdue
+        </span>
+      </div>
+    </header>
+
+    <div class="content-grid">
+      <div class="main-column card-stagger">
+        <div class="widget-card">
+          <div class="widget-header">
+            <h2 class="widget-title">Activity Timeline</h2>
+          </div>
+          <div class="widget-content">
+            <ul class="timeline">
+              <li *ngFor="let item of d.activity" class="timeline-item">
+                <div class="timeline-icon">
+                  <mat-icon>check_circle</mat-icon>
+                </div>
+                <div class="timeline-content">
+                  <p class="timeline-title">{{ item.action }}</p>
+                  <p class="timeline-detail" *ngIf="item.detail">{{ item.detail }}</p>
+                  <p class="timeline-time">{{ item.atTime | date:'medium' }}</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="widget-card">
+          <div class="widget-header">
+            <h2 class="widget-title">Evidence Locker</h2>
+            <p class="widget-subtitle">Upload supporting documents, open them for review, and download them again when needed.</p>
+          </div>
+          <div class="widget-content">
+            <div class="evidence-upload-area" *ngIf="canUploadEvidence(); else uploadDisabled">
+              <button type="button" mat-stroked-button (click)="fileInput.click()">
+                <mat-icon>upload_file</mat-icon>
+                <span>Upload Evidence</span>
+              </button>
+              <input hidden #fileInput type="file" (change)="onFile($event)" />
+              <p class="upload-hint" *ngIf="uploading">Uploading...</p>
+            </div>
+
+            <ul *ngIf="d.evidence?.length" class="evidence-list">
+              <li *ngFor="let e of d.evidence">
+                <mat-icon>insert_drive_file</mat-icon>
+                <div class="file-info">
+                  <span class="file-name">{{ e.fileName }}</span>
+                  <span class="file-date">Uploaded on {{ e.uploadedAt | date:'mediumDate' }}</span>
+                </div>
+                <div class="file-actions">
+                  <button type="button" mat-button color="primary" (click)="viewEvidence(e.id, e.fileName)">View</button>
+                  <button type="button" mat-stroked-button color="primary" (click)="downloadEvidence(e.id, e.fileName)">Download</button>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-column card-stagger">
+        <div class="widget-card">
+          <div class="widget-header">
+            <h2 class="widget-title">Manage Case</h2>
+          </div>
+          <div class="widget-content action-panel">
+            <div class="assignment-row">
+              <span>Assigned To</span>
+              <strong>{{ assignmentLabel() }}</strong>
+            </div>
+            <div class="assignment-row">
+              <span>Current Role</span>
+              <strong>{{ isAdmin() ? 'Admin Override' : formatLabel(roleForStatus(d.status)) }}</strong>
+            </div>
+            <div class="assignment-row">
+              <span>Next Stage</span>
+              <strong>{{ nextStageLabel() }}</strong>
+            </div>
+            <div class="assignment-row" *ngIf="statusActions().length">
+              <span>Next Role</span>
+              <strong>{{ nextStageRoleLabel() }}</strong>
+            </div>
+
+            <div class="action-buttons">
+              <button *ngIf="canClaim()" mat-stroked-button color="primary" [disabled]="claiming" (click)="claimCase()">
+                Claim Case
+              </button>
+
+              <button *ngIf="isAdmin() && d.status === 'CLOSED'" mat-stroked-button color="primary" [disabled]="reopening" (click)="reopenCase()">
+                {{ reopening ? 'Reopening...' : 'Reopen Case' }}
+              </button>
+
+              <ng-container *ngFor="let action of statusActions()">
+                <button
+                  mat-flat-button
+                  [color]="action.color || 'primary'"
+                  [disabled]="!canAct()"
+                  (click)="updateStatus(action.status, action.detail)">
+                  {{ action.label }}
+                </button>
+              </ng-container>
+            </div>
+
+            <p class="action-hint">{{ actionHint() }}</p>
+            <p class="action-error" *ngIf="error">{{ error }}</p>
+          </div>
+        </div>
+
+        <div class="widget-card" *ngIf="d?.protocolChecklist?.length">
+          <div class="widget-header">
+            <h2 class="widget-title">Protocol Checklist</h2>
+            <p class="widget-subtitle">Track the steps that must be completed in order.</p>
+          </div>
+          <div class="widget-content">
+            <ul class="protocol-list">
+              <li *ngFor="let step of d.protocolChecklist">
+                <mat-icon class="protocol-icon" [class.completed]="step.completed">
+                  {{ step.completed ? 'check_circle' : 'radio_button_unchecked' }}
+                </mat-icon>
+                <span>{{ step.label }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="widget-card">
+          <div class="widget-header">
+            <h2 class="widget-title">Case Details</h2>
+          </div>
+          <div class="widget-content">
+            <ul class="details-list">
+              <li><span>Amount</span><strong>{{ d.transaction.amount | currency:d.transaction.currency }}</strong></li>
+              <li><span>Response Due</span><strong>{{ d.dueAt | date:'fullDate' }}</strong></li>
+              <li><span>Network Due</span><strong>{{ d.networkDueAt | date:'fullDate' }}</strong></li>
+              <li><span>Dispute Type</span><strong>{{ d.disputeType | titlecase }}</strong></li>
+              <li><span>Scheme Category</span><strong>{{ d.schemeCategory }}</strong></li>
+              <li><span>Reason Code</span><strong>{{ d.schemeReasonCode }}</strong></li>
+              <li><span>Eligibility</span><strong>{{ formatLabel(d.eligibilityStatus) }}</strong></li>
+              <li><span>Settlement Outcome</span><strong>{{ settlementLabel() }}</strong></li>
+              <li *ngIf="d.eligibilityNotes"><span>Eligibility Notes</span><strong>{{ d.eligibilityNotes }}</strong></li>
+              <li><span>Card</span><strong>**** {{ d.transaction.cardLast4 }}</strong></li>
+              <li><span>Network</span><strong>{{ d.transaction.network }}</strong></li>
+              <li><span>Channel</span><strong>{{ d.transaction.channel }}</strong></li>
+              <li><span>Merchant ID</span><strong>{{ d.transaction.merchantId }}</strong></li>
+              <li><span>Customer ID</span><strong>{{ d.transaction.customerIdentifier }}</strong></li>
+              <li><span>Txn. Reference</span><strong>{{ d.transaction.transactionRef }}</strong></li>
+              <li><span>RRN</span><strong>{{ d.transaction.rrn }}</strong></li>
+              <li><span>Auth Code</span><strong>{{ d.transaction.authCode }}</strong></li>
+              <li><span>Terminal ID</span><strong>{{ d.transaction.terminalId }}</strong></li>
+              <li><span>Terminal Location</span><strong>{{ d.transaction.terminalLocation }}</strong></li>
+              <li><span>Merchant Refunded</span><strong>{{ d.transaction.merchantRefunded ? 'Yes' : 'No' }}</strong></li>
+              <li *ngIf="d.transaction.refundRef"><span>Refund Ref</span><strong>{{ d.transaction.refundRef }}</strong></li>
+              <li *ngIf="d.transaction.refundAt"><span>Refund Date</span><strong>{{ d.transaction.refundAt | date:'medium' }}</strong></li>
+              <li *ngIf="d.submissionRef"><span>Submission Ref</span><strong>{{ d.submissionRef }}</strong></li>
+              <li><span>Txn. Date</span><strong>{{ d.transaction.txDate | date:'medium' }}</strong></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="widget-card" *ngIf="d.postings?.length">
+          <div class="widget-header">
+            <h2 class="widget-title">Financial Postings</h2>
+          </div>
+          <div class="widget-content">
+            <ul class="details-list">
+              <li *ngFor="let p of d.postings">
+                <span>{{ p.postingType }} - {{ p.status }}</span>
+                <strong>{{ p.amount | currency:p.currency }}</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="widget-card" *ngIf="d.fraudFlags?.length">
+          <div class="widget-header">
+            <h2 class="widget-title">Fraud Flags</h2>
+          </div>
+          <div class="widget-content">
+            <ul class="details-list">
+              <li *ngFor="let f of d.fraudFlags">
+                <span>{{ f.flagType }} ({{ f.severity }})</span>
+                <strong>{{ f.detail }}</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #uploadDisabled>
+  <div class="upload-disabled">
+    Evidence uploads are only allowed in the evidence stages: Needs Info and Ready For Submission.
+  </div>
+</ng-template>
+
+<ng-template #skeletonLoader>
+  <header class="page-header skeleton-header"></header>
+  <div class="content-grid">
+    <div class="main-column">
+      <div class="widget-card skeleton" style="height: 300px;"></div>
+      <div class="widget-card skeleton" style="height: 200px;"></div>
+    </div>
+    <div class="side-column">
+      <div class="widget-card skeleton" style="height: 200px;"></div>
+      <div class="widget-card skeleton" style="height: 400px;"></div>
+    </div>
+  </div>
+</ng-template>

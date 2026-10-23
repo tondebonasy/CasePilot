@@ -1,0 +1,134 @@
+@use 'app/theme' as theme;
+@import 'app/pages/admin/sla-manager.component.scss';
+@import 'app/pages/disputes/disputes.component.scss';
+@import 'app/pages/dashboard/dashboard.component.scss';
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: theme.space(lg);
+  margin-bottom: theme.space(lg);
+  .page-header__content {
+    display: flex;
+    flex-direction: column;
+    gap: theme.space(xs);
+  }
+}
+
+:host {
+    --mat-tab-header-inactive-label-text-color: #{theme.color(neutral-600)};
+    --mat-tab-header-active-label-text-color: #{theme.color(primary)};
+    --mat-tab-ink-bar-color: #{theme.color(primary)};
+
+    .mat-mdc-tab-body-content {
+        padding: theme.space(xl) 0;
+    }
+    .tab-icon {
+        margin-right: theme.space(sm);
+    }
+}
+
+.tab-content {
+    padding-top: theme.space(lg);
+}
+.training-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: theme.space(lg);
+}
+
+.training-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: theme.radius(lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    position: relative;
+    overflow: hidden;
+    @include theme.transition(transform, box-shadow);
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 4px;
+        background: linear-gradient(90deg, theme.color(primary) 0%, #22c55e 100%);
+        opacity: 0.4;
+    }
+
+    .card-content {
+        padding: theme.space(lg);
+    }
+    .card-title {
+        @include theme.apply-typography(h3);
+        margin-bottom: theme.space(xs);
+    }
+    .card-policy {
+        @include theme.apply-typography(small);
+        font-weight: theme.$font-weight-bold;
+        color: theme.color(neutral-600);
+        margin-bottom: theme.space(md);
+    }
+    .card-desc {
+        @include theme.apply-typography(body);
+        color: theme.color(neutral-700);
+    }
+    .card-actions {
+        padding: theme.space(md) theme.space(lg);
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+        display: flex;
+        justify-content: flex-end;
+
+        a {
+            font-weight: theme.$font-weight-bold;
+            .mat-icon {
+                margin-left: theme.space(xs);
+            }
+        }
+    }
+}
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: theme.space(lg);
+    .skeleton-card {
+        height: 250px;
+        border-radius: theme.radius(lg);
+        animation: shimmer 1.2s linear infinite;
+        background-color: #f0f0f0;
+    }
+}
+
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: theme.space(xxxl);
+    mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        color: theme.color(neutral-400);
+        margin-bottom: theme.space(md);
+    }
+    h3 {
+        @include theme.apply-typography(h3);
+    }
+    p {
+        color: theme.color(neutral-600);
+    }
+}

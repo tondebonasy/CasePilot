@@ -1,0 +1,79 @@
+<div class="login-container">
+  <div class="money-pattern money-pattern-left" aria-hidden="true"></div>
+  <div class="money-pattern money-pattern-right" aria-hidden="true"></div>
+  <div class="login-layout">
+    <section class="brand-panel">
+      <div class="brand-orb orb-1"></div>
+      <div class="brand-orb orb-2"></div>
+      <div class="brand-grid"></div>
+      <div class="vault-ring vault-ring-a" aria-hidden="true"></div>
+      <div class="vault-ring vault-ring-b" aria-hidden="true"></div>
+      <div class="currency-strip currency-strip-a" aria-hidden="true"></div>
+      <div class="currency-strip currency-strip-b" aria-hidden="true"></div>
+      <div class="brand-mark">
+        <img class="casepilot-logo" src="assets/casepilot-mark.svg" alt="CasePilot" decoding="async" />
+        <div class="brand-text">
+          <p class="brand-label">CasePilot</p>
+          <h1 class="brand-title">Dispute Management System</h1>
+          <p class="brand-subtitle">
+            Dispute resolution and evidence handling for banks.
+          </p>
+          <ul class="brand-list">
+            <li>Scheme deadlines and audit-ready evidence control.</li>
+            <li>Bank-grade oversight of dispute outcomes.</li>
+            <li>Bank-ready reporting across channels and merchants.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="brand-footnote">
+        Built for bank dispute operations and evidence management.
+      </div>
+    </section>
+
+    <div class="login-card">
+
+      <div class="login-header">
+        <mat-icon class="brand-icon">assured_workload</mat-icon>
+        <h2 class="title">Sign in to your Account</h2>
+        <p class="subtitle">Sign in to access bank oversight tools and dispute workflows.</p>
+      </div>
+
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" placeholder="e.g., you@bank.com" type="email" autocomplete="username" />
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required.</mat-error>
+          <mat-error *ngIf="form.get('email')?.hasError('email')">Please enter a valid email address.</mat-error>
+        </mat-form-field>
+
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="current-password" />
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button" [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'" [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="form.get('password')?.hasError('required')">Password is required.</mat-error>
+        </mat-form-field>
+
+
+        <button mat-flat-button color="primary" class="submit-button" [disabled]="form.invalid || loading">
+          <span *ngIf="!loading">Sign In</span>
+          <span *ngIf="loading" class="loading-indicator">
+            <mat-icon>hourglass_top</mat-icon>
+            <span>Signing in...</span>
+          </span>
+        </button>
+
+
+        <div class="server-error" role="alert" *ngIf="error">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ error }}</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

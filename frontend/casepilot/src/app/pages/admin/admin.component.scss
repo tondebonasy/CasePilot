@@ -1,0 +1,71 @@
+@use 'app/theme' as theme;
+.page-header {
+  position: relative;
+  margin-bottom: theme.space(lg);
+  padding: theme.space(xl);
+  border-radius: theme.radius(lg);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background:
+    radial-gradient(220px 120px at 100% 0%, rgba(214, 179, 84, 0.22), transparent 68%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(244, 250, 247, 0.92));
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(15, 76, 58, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15, 76, 58, 0.05) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0));
+    pointer-events: none;
+  }
+
+  .page-title {
+    position: relative;
+    z-index: 1;
+    @include theme.apply-typography(h1);
+    margin-bottom: theme.space(xs);
+  }
+  .page-subtitle {
+    position: relative;
+    z-index: 1;
+    @include theme.apply-typography(body);
+    color: theme.color(neutral-600);
+    max-width: 70ch;
+  }
+}
+:host {
+  --mat-tab-header-inactive-label-text-color: #{theme.color(neutral-600)};
+  --mat-tab-header-active-label-text-color: #{theme.color(primary)};
+  --mat-tab-header-active-hover-label-text-color: #{theme.color(primary)};
+  --mat-tab-header-active-focus-label-text-color: #{theme.color(primary)};
+  --mat-tab-header-inactive-focus-label-text-color: #{theme.color(neutral-800)};
+  --mat-tab-header-inactive-hover-label-text-color: #{theme.color(neutral-800)};
+  --mat-tab-ink-bar-color: #{theme.color(primary)};
+
+  .mat-mdc-tab {
+    height: 56px;
+  }
+
+  .mat-mdc-tab-body-content {
+    padding: theme.space(xl) 0;
+  }
+
+  .tab-icon {
+    margin-right: theme.space(sm);
+  }
+}
+
+.tab-content {
+    padding-top: theme.space(lg);
+    position: relative;
+}
+
+@media (max-width: 720px) {
+  .page-header {
+    padding: theme.space(lg);
+  }
+}

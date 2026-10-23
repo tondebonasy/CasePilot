@@ -1,0 +1,89 @@
+
+<mat-sidenav-container class="app-container" [class.app-container--logged-out]="!isAuthed()">
+  <div class="app-money-pattern app-money-pattern--left" aria-hidden="true"></div>
+  <div class="app-money-pattern app-money-pattern--right" aria-hidden="true"></div>
+
+
+  <mat-sidenav class="app-sidebar"
+               [class.app-sidebar--collapsed]="sidebarCollapsed"
+               [opened]="isAuthed()"
+               [mode]="isAuthed() ? 'side' : 'over'"
+               *ngIf="isAuthed()">
+
+    <div class="sidebar-content">
+      <div class="sidebar-pattern sidebar-pattern--coins" aria-hidden="true"></div>
+      <div class="sidebar-pattern sidebar-pattern--vault" aria-hidden="true"></div>
+
+      <div class="sidebar-header">
+        <div class="brand-lockup">
+          <svg class="brand-logo" viewBox="0 0 96 96" fill="none" role="img" aria-label="CasePilot">
+            <rect width="96" height="96" rx="24" fill="#102A56" />
+            <path d="M65 28a27 27 0 1 0 0 40" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" />
+            <path d="m43 49 11 11 24-28" stroke="#68D5D0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <div class="brand-text" *ngIf="!sidebarCollapsed">
+            <span class="brand-name">CasePilot</span>
+            <span class="brand-subtitle">Dispute Management System</span>
+          </div>
+        </div>
+        <button
+          mat-icon-button
+          class="sidebar-toggle"
+          type="button"
+          (click)="toggleSidebar()"
+          [attr.aria-label]="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+          <mat-icon>{{ sidebarCollapsed ? 'right_panel_open' : 'left_panel_close' }}</mat-icon>
+        </button>
+      </div>
+
+      <div class="sidebar-body">
+
+        <mat-nav-list class="nav-list">
+          <h3 class="nav-list-title" *ngIf="!sidebarCollapsed">Menu</h3>
+          <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link" [attr.aria-label]="'Dashboard'" [attr.title]="sidebarCollapsed ? 'Dashboard' : null">
+            <mat-icon matListItemIcon>dashboard</mat-icon>
+            <span matListItemTitle *ngIf="!sidebarCollapsed">Dashboard</span>
+          </a>
+          <a mat-list-item routerLink="/disputes" routerLinkActive="active-link" [attr.aria-label]="'Disputes'" [attr.title]="sidebarCollapsed ? 'Disputes' : null">
+            <mat-icon matListItemIcon>gavel</mat-icon>
+            <span matListItemTitle *ngIf="!sidebarCollapsed">Disputes</span>
+          </a>
+          <a mat-list-item routerLink="/training" routerLinkActive="active-link" [attr.aria-label]="'Bank Training'" [attr.title]="sidebarCollapsed ? 'Bank Training' : null">
+            <mat-icon matListItemIcon>school</mat-icon>
+            <span matListItemTitle *ngIf="!sidebarCollapsed">Bank Training</span>
+          </a>
+        </mat-nav-list>
+
+        <mat-nav-list class="nav-list" *ngIf="isAdmin()">
+          <h3 class="nav-list-title" *ngIf="!sidebarCollapsed">Admin</h3>
+          <a mat-list-item routerLink="/admin" routerLinkActive="active-link" [attr.aria-label]="'Admin Panel'" [attr.title]="sidebarCollapsed ? 'Admin Panel' : null">
+            <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
+            <span matListItemTitle *ngIf="!sidebarCollapsed">Admin Panel</span>
+          </a>
+        </mat-nav-list>
+      </div>
+
+
+      <div class="sidebar-footer">
+        <mat-divider></mat-divider>
+        <div class="user-profile">
+          <div class="user-avatar" aria-hidden="true">{{ userLabel().slice(0, 1) || 'U' }}</div>
+          <div class="user-info" *ngIf="!sidebarCollapsed">
+            <span class="user-name">{{ userLabel() }}</span>
+            <span class="user-role">{{ auth.user()?.role | titlecase }}</span>
+          </div>
+          <button mat-icon-button (click)="logout()" aria-label="Logout" [attr.title]="sidebarCollapsed ? 'Logout' : null">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </mat-sidenav>
+
+
+  <mat-sidenav-content class="main-content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

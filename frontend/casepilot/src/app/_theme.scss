@@ -1,0 +1,119 @@
+
+$colors: (
+  primary-light: #eaf1ff,
+  primary: #285bd3,
+  primary-dark: #1744a2,
+  neutral-0: #ffffff,
+  neutral-100: #f5f8fc,
+  neutral-200: #e6edf7,
+  neutral-300: #d6e1f0,
+  neutral-400: #a7b8d1,
+  neutral-500: #8799b3,
+  neutral-600: #586b85,
+  neutral-700: #354a65,
+  neutral-800: #172944,
+  neutral-900: #0d1c32,
+  success-light: #e8f4ec,
+  success: #0f7a4b,
+  success-dark: #0b5a38,
+  warning-light: #fff3dc,
+  warning: #e0a12a,
+  warning-dark: #a87210,
+  error-light: #ffe9e3,
+  error: #d6452c,
+  error-dark: #a92d1a
+);
+@function color($color-name) {
+  @return map-get($colors, $color-name);
+}
+
+$spacing: (
+  xxs: 4px,
+  xs: 8px,
+  sm: 12px,
+  md: 16px,
+  lg: 24px,
+  xl: 32px,
+  xxl: 40px,
+  xxxl: 48px,
+  xxxxl: 64px
+);
+@function space($space-name) {
+  @return map-get($spacing, $space-name);
+}
+$font-family-sans: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+$font-family-mono: "SF Mono", "Consolas", "Liberation Mono", Menlo, Courier, monospace;
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+$typography: (
+  h1: (
+    font-size: 2.375rem,
+    font-weight: $font-weight-bold,
+    line-height: 1.2
+  ),
+  h2: (
+    font-size: 1.875rem,
+    font-weight: $font-weight-bold,
+    line-height: 1.3
+  ),
+  h3: (
+    font-size: 1.25rem,
+    font-weight: $font-weight-bold,
+    line-height: 1.4
+  ),
+  body: (
+    font-size: 1rem,
+    font-weight: $font-weight-regular,
+    line-height: 1.6
+  ),
+  small: (
+    font-size: 0.875rem,
+    font-weight: $font-weight-regular,
+    line-height: 1.5
+  ),
+  label: (
+    font-size: 0.875rem,
+    font-weight: $font-weight-medium,
+    line-height: 1.5
+  )
+);
+@mixin apply-typography($style-name) {
+  $style: map-get($typography, $style-name);
+  font-size: map-get($style, font-size);
+  font-weight: map-get($style, font-weight);
+  line-height: map-get($style, line-height);
+}
+@function font-size($style-name) {
+  $style: map-get($typography, $style-name);
+  @return map-get($style, font-size);
+}
+
+$border-radius: (
+  sm: 6px,
+  md: 10px,
+  lg: 14px,
+  full: 9999px
+);
+@function radius($radius-name) {
+  @return map-get($border-radius, $radius-name);
+}
+
+$shadows: (
+  1: (0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.06)),
+  2: (0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04)),
+  3: (0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05))
+);
+@function shadow($level) {
+  @return map-get($shadows, $level);
+}
+
+$transition-speed-fast: 150ms;
+$transition-speed-normal: 250ms;
+$transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+@mixin transition($properties...) {
+  transition-property: $properties;
+  transition-duration: $transition-speed-normal;
+  transition-timing-function: $transition-easing;
+}

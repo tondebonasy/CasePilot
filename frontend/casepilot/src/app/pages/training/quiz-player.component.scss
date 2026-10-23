@@ -1,0 +1,161 @@
+@use 'app/theme' as theme;
+
+.quiz-container {
+    max-width: 800px;
+    margin: theme.space(xxl) auto;
+    background-color: theme.color(neutral-0);
+    border: 1px solid theme.color(neutral-200);
+    border-radius: theme.radius(lg);
+    box-shadow: theme.shadow(3);
+    display: flex;
+    flex-direction: column;
+}
+
+.quiz-header {
+    padding: theme.space(lg);
+    border-bottom: 1px solid theme.color(neutral-200);
+    h1 {
+        @include theme.apply-typography(h2);
+        margin-top: theme.space(md);
+    }
+    p {
+        @include theme.apply-typography(body);
+        color: theme.color(neutral-600);
+        margin-top: theme.space(xs);
+    }
+}
+
+.progress-container {
+    padding: theme.space(md) theme.space(lg);
+    display: flex;
+    align-items: center;
+    gap: theme.space(md);
+
+    mat-progress-bar {
+        flex: 1;
+        --mdc-linear-progress-active-indicator-color: #{theme.color(primary)};
+    }
+    .progress-label {
+        @include theme.apply-typography(small);
+        color: theme.color(neutral-600);
+        font-weight: theme.$font-weight-bold;
+    }
+}
+
+.question-area {
+    padding: theme.space(xxl);
+    min-height: 250px;
+}
+
+.question-text {
+    @include theme.apply-typography(h2);
+    margin-bottom: theme.space(xl);
+}
+
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: theme.space(md);
+    .option {
+        padding: theme.space(md);
+        border: 1px solid theme.color(neutral-300);
+        border-radius: theme.radius(md);
+        @include theme.transition(border-color, background-color);
+
+        &:hover {
+            background-color: theme.color(neutral-100);
+        }
+        &.mat-mdc-radio-checked {
+            border-color: theme.color(primary);
+            background-color: theme.color(primary-light);
+        }
+    }
+}
+
+.quiz-footer {
+    padding: theme.space(lg);
+    border-top: 1px solid theme.color(neutral-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    button {
+        height: 44px;
+        .mat-icon {
+            font-size: 20px;
+        }
+    }
+}
+.results-card {
+    .results-header {
+        padding: theme.space(xl);
+        text-align: center;
+        color: theme.color(neutral-0);
+
+        &.pass { background-color: theme.color(success-dark); }
+        &.fail { background-color: theme.color(error-dark); }
+
+        .mat-icon {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+            margin-bottom: theme.space(md);
+        }
+        h2 {
+            @include theme.apply-typography(h2);
+            color: theme.color(neutral-0);
+        }
+    }
+
+    .results-content {
+        padding: theme.space(xl);
+    }
+
+    .score {
+        text-align: center;
+        font-size: 1.25rem;
+        margin-bottom: theme.space(xl);
+        strong {
+            font-size: 2rem;
+            font-weight: theme.$font-weight-bold;
+        }
+    }
+
+    .weaknesses {
+        h3 {
+            @include theme.apply-typography(h3);
+            margin-bottom: theme.space(md);
+            border-bottom: 1px solid theme.color(neutral-200);
+            padding-bottom: theme.space(sm);
+        }
+        ul {
+            list-style: none;
+            li {
+                margin-bottom: theme.space(lg);
+                h4 { font-weight: theme.$font-weight-bold; }
+                p {
+                    @include theme.apply-typography(small);
+                    color: theme.color(neutral-700);
+                    margin-top: theme.space(xxs);
+                }
+            }
+        }
+    }
+
+    .results-footer {
+        margin-top: theme.space(xl);
+        padding-top: theme.space(lg);
+        border-top: 1px solid theme.color(neutral-200);
+        text-align: center;
+    }
+}
+
+.centered-state {
+    padding: theme.space(xxxxl);
+    text-align: center;
+    color: theme.color(neutral-600);
+
+    &.error-state {
+        color: theme.color(error-dark);
+    }
+}

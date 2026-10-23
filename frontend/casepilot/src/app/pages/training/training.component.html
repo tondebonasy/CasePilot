@@ -1,0 +1,212 @@
+
+<header class="page-header">
+  <div class="page-header__content">
+    <div class="page-header__badge">
+      <mat-icon>school</mat-icon>
+    </div>
+    <div>
+      <h1 class="page-title">Bank Training & Awareness</h1>
+      <p class="page-subtitle">Complete quizzes on internal policies to ensure compliance and best practices.</p>
+    </div>
+  </div>
+  <button mat-stroked-button color="primary" (click)="exportCsv()">
+    <mat-icon>download</mat-icon>
+    Export CSV
+  </button>
+</header>
+
+
+<div *ngIf="error" class="form-message error" role="alert">
+  <span>{{ error }}</span>
+  <button mat-stroked-button type="button" (click)="refresh()" [disabled]="loading">Retry</button>
+</div>
+<mat-tab-group animationDuration="0ms" mat-stretch-tabs="false" mat-align-tabs="start">
+
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">school</mat-icon>
+      <span>Available Trainings</span>
+    </ng-template>
+    <div class="tab-content">
+        <div class="training-grid card-stagger" *ngIf="!loading; else skeleton">
+            <div *ngFor="let quiz of quizzes" class="training-card">
+                <div class="card-content">
+                    <h2 class="card-title">{{ quiz.title }}</h2>
+                    <p class="card-policy">Policy: {{ policyTitle(quiz.policyId) }}</p>
+                    <p class="card-desc">{{ quiz.description }}</p>
+                </div>
+                <div class="card-actions">
+                    <a mat-flat-button color="primary" [routerLink]="['/training/quiz', quiz.id]">
+                        <span>Start Quiz</span>
+                        <mat-icon>arrow_forward</mat-icon>
+                    </a>
+                </div>
+            </div>
+            <div *ngIf="quizzes.length === 0" class="empty-state">
+                <mat-icon class="empty-state-icon">quiz</mat-icon>
+                <h3 class="empty-state-title">No Quizzes Available</h3>
+                <p class="empty-state-message">There are currently no training quizzes assigned.</p>
+            </div>
+        </div>
+    </div>
+  </mat-tab>
+
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">history</mat-icon>
+      <span>My History</span>
+    </ng-template>
+    <div class="tab-content">
+      <div class="table-container" *ngIf="!loading; else skeleton">
+        <table mat-table [dataSource]="attempts" class="disputes-table">
+
+          <ng-container matColumnDef="quiz">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-badge"><mat-icon>quiz</mat-icon><span>Quiz Title</span></span>
+            </th>
+            <td mat-cell *matCellDef="let a">{{ a.quizTitle }}</td>
+          </ng-container>
+          <ng-container matColumnDef="score">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-badge"><mat-icon>score</mat-icon><span>Score</span></span>
+            </th>
+            <td mat-cell *matCellDef="let a">
+                <strong>{{ a.score }} / {{ a.maxScore }}</strong>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="percent">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-badge"><mat-icon>percent</mat-icon><span>Percent</span></span>
+            </th>
+            <td mat-cell *matCellDef="let a">
+                {{ (a.score / a.maxScore) * 100 | number:'1.0-0' }}%
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>
+              <span class="th-badge"><mat-icon>event</mat-icon><span>Date Completed</span></span>
+            </th>
+            <td mat-cell *matCellDef="let a">{{ a.createdAt | date:'medium' }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['quiz', 'score', 'percent', 'date']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['quiz', 'score', 'percent', 'date'];"></tr>
+        </table>
+        <div *ngIf="attempts.length === 0" class="empty-state">
+            <mat-icon class="empty-state-icon">history_toggle_off</mat-icon>
+            <h3 class="empty-state-title">No Attempts Yet</h3>
+            <p class="empty-state-message">Your quiz attempt history will appear here.</p>
+        </div>
+      </div>
+    </div>
+  </mat-tab>
+
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">leaderboard</mat-icon>
+      <span>Team Performance</span>
+    </ng-template>
+    <div class="tab-content">
+      <div class="kpi-grid card-stagger" *ngIf="!loading; else skeleton">
+        <div class="kpi-card">
+            <p class="kpi-title">Average Score</p>
+            <p class="kpi-value">{{ (metrics?.averageScore ?? 0) | number:'1.0-1' }}%</p>
+        </div>
+        <div class="kpi-card">
+            <p class="kpi-title">Total Completions</p>
+            <p class="kpi-value">{{ metrics?.completionCount ?? 0 }}</p>
+        </div>
+      </div>
+
+      <div class="widget-grid card-stagger" *ngIf="!loading; else skeleton">
+        <div class="widget-card">
+          <div class="widget-header">
+            <h2 class="widget-title">Awareness by Policy</h2>
+            <p class="widget-subtitle">Average scores grouped by Bank policy.</p>
+          </div>
+          <div class="widget-content">
+            <table mat-table [dataSource]="metrics?.byPolicy ?? []" class="disputes-table" *ngIf="metrics?.byPolicy?.length; else noPolicyData">
+              <ng-container matColumnDef="policy">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="th-badge"><mat-icon>policy</mat-icon><span>Policy</span></span>
+                </th>
+                <td mat-cell *matCellDef="let row">{{ row.policyTitle }}</td>
+              </ng-container>
+              <ng-container matColumnDef="average">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="th-badge"><mat-icon>analytics</mat-icon><span>Average</span></span>
+                </th>
+                <td mat-cell *matCellDef="let row">{{ row.averageScore | number:'1.0-1' }}%</td>
+              </ng-container>
+              <ng-container matColumnDef="attempts">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="th-badge"><mat-icon>fact_check</mat-icon><span>Attempts</span></span>
+                </th>
+                <td mat-cell *matCellDef="let row">{{ row.attempts }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="policyColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: policyColumns;"></tr>
+            </table>
+            <ng-template #noPolicyData>
+              <div class="empty-state">
+                <mat-icon class="empty-state-icon">policy</mat-icon>
+                <h3 class="empty-state-title">No Policy Data</h3>
+                <p class="empty-state-message">Policy awareness metrics will appear once attempts are recorded.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <div class="widget-card">
+          <div class="widget-header">
+            <h2 class="widget-title">Awareness by Role</h2>
+            <p class="widget-subtitle">Average scores grouped by staff role.</p>
+          </div>
+          <div class="widget-content">
+            <table mat-table [dataSource]="metrics?.byRole ?? []" class="disputes-table" *ngIf="metrics?.byRole?.length; else noRoleData">
+              <ng-container matColumnDef="role">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="th-badge"><mat-icon>group</mat-icon><span>Role</span></span>
+                </th>
+                <td mat-cell *matCellDef="let row">{{ row.role | titlecase }}</td>
+              </ng-container>
+              <ng-container matColumnDef="average">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="th-badge"><mat-icon>analytics</mat-icon><span>Average</span></span>
+                </th>
+                <td mat-cell *matCellDef="let row">{{ row.averageScore | number:'1.0-1' }}%</td>
+              </ng-container>
+              <ng-container matColumnDef="attempts">
+                <th mat-header-cell *matHeaderCellDef>
+                  <span class="th-badge"><mat-icon>fact_check</mat-icon><span>Attempts</span></span>
+                </th>
+                <td mat-cell *matCellDef="let row">{{ row.attempts }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="roleColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: roleColumns;"></tr>
+            </table>
+            <ng-template #noRoleData>
+              <div class="empty-state">
+                <mat-icon class="empty-state-icon">group</mat-icon>
+                <h3 class="empty-state-title">No Role Data</h3>
+                <p class="empty-state-message">Role-based awareness metrics will appear once attempts are recorded.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-tab>
+
+</mat-tab-group>
+
+<ng-template #skeleton>
+    <div class="skeleton-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+    </div>
+</ng-template>

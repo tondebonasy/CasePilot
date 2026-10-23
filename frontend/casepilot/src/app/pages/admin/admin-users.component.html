@@ -1,0 +1,174 @@
+<mat-drawer-container class="admin-drawer-layout card-stagger" autosize>
+  <mat-drawer-content>
+    <div class="widget-card table-widget">
+      <div class="manager-toolbar">
+        <div class="manager-heading">
+          <h2 class="manager-title">Users</h2>
+          <p class="manager-subtitle">Manage staff accounts, role assignments, and access status.</p>
+        </div>
+        <button mat-flat-button color="primary" class="drawer-launch" type="button" (click)="openCreateDrawer()">
+          <mat-icon>person_add</mat-icon>
+          New User
+        </button>
+      </div>
+
+      <div class="widget-content">
+        <div *ngIf="message" class="form-message success table-message">{{ message }}</div>
+        <div *ngIf="error" class="form-message error table-message"><span>{{ error }}</span>
+          <button *ngIf="loadFailed" mat-stroked-button type="button" (click)="loadUsers()" [disabled]="loading">Retry</button></div>
+
+        <ng-container *ngIf="!loading; else skeleton">
+          <table mat-table [dataSource]="dataSource" class="disputes-table" *ngIf="dataSource.data.length; else empty">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>
+                <span class="th-badge"><mat-icon>person</mat-icon><span>Name</span></span>
+              </th>
+              <td mat-cell *matCellDef="let user">{{ user.fullName }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>
+                <span class="th-badge"><mat-icon>mail</mat-icon><span>Email</span></span>
+              </th>
+              <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef>
+                <span class="th-badge"><mat-icon>badge</mat-icon><span>Role</span></span>
+              </th>
+              <td mat-cell *matCellDef="let user">
+                <mat-select [value]="roleEdits[user.id] ?? user.role" (selectionChange)="setRole(user, $event.value)">
+                  <mat-option *ngFor="let role of roles" [value]="role">{{ label(role) }}</mat-option>
+                </mat-select>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>
+                <span class="th-badge"><mat-icon>toggle_on</mat-icon><span>Status</span></span>
+              </th>
+              <td mat-cell *matCellDef="let user">
+                <span class="status-pill" [class.enabled]="user.enabled">{{ user.enabled ? 'Enabled' : 'Disabled' }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>
+                <span class="th-badge"><mat-icon>settings</mat-icon><span>Actions</span></span>
+              </th>
+              <td mat-cell *matCellDef="let user">
+                <button mat-icon-button color="primary"
+                        (click)="saveRole(user)"
+                        [disabled]="(roleEdits[user.id] ?? user.role) === user.role"
+                        aria-label="Save role">
+                  <mat-icon>save</mat-icon>
+                </button>
+                <button mat-icon-button color="accent"
+                        (click)="openResetPasswordDrawer(user)"
+                        aria-label="Reset password">
+                  <mat-icon>lock_reset</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="toggleStatus(user)" aria-label="Toggle status">
+                  <mat-icon>{{ user.enabled ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+          </table>
+        </ng-container>
+
+        <ng-template #skeleton>
+          <div class="skeleton-table">
+            <div class="skeleton-row header"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </ng-template>
+
+        <ng-template #empty>
+          <div class="empty-state" *ngIf="!loadFailed">
+            <mat-icon class="empty-state-icon">group_off</mat-icon>
+            <h3 class="empty-state-title">No Users Found</h3>
+            <p class="empty-state-message">Create staff accounts to assign roles and permissions.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </mat-drawer-content>
+
+  <mat-drawer class="admin-drawer-panel" position="end" mode="over" [opened]="drawerOpen" (closedStart)="closeDrawer()">
+    <div class="admin-drawer-scroll">
+      <div class="admin-drawer-header">
+        <div class="admin-drawer-overline">
+          <mat-icon>{{ drawerMode === 'create' ? 'person_add' : 'lock_reset' }}</mat-icon>
+          <span>{{ drawerMode === 'create' ? 'User Setup' : 'Credential Update' }}</span>
+        </div>
+        <h2 class="admin-drawer-title">{{ drawerMode === 'create' ? 'Create User' : 'Reset Password' }}</h2>
+        <p class="admin-drawer-subtitle">
+          {{ drawerMode === 'create'
+            ? 'Provision a new staff account and assign the appropriate dispute role.'
+            : 'Set a fresh password for ' + (selectedUser?.fullName || 'the selected user') + '.' }}
+        </p>
+      </div>
+
+      <form *ngIf="drawerMode === 'create'" [formGroup]="userForm" (ngSubmit)="createUser()" class="admin-drawer-form">
+        <div class="admin-drawer-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Full name</mat-label>
+            <input matInput formControlName="fullName" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" />
+          </mat-form-field>
+        </div>
+
+        <div class="admin-drawer-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Role</mat-label>
+            <mat-select formControlName="role">
+              <mat-option *ngFor="let role of roles" [value]="role">{{ label(role) }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="admin-drawer-note">Use distinct staff roles so work queues and dispute handoffs remain controlled.</div>
+        <div *ngIf="message" class="admin-drawer-message success">{{ message }}</div>
+        <div *ngIf="error" class="admin-drawer-message error">{{ error }}</div>
+
+        <div class="admin-drawer-actions">
+          <button mat-button type="button" (click)="closeDrawer()">Close</button>
+          <div class="admin-drawer-actions-group">
+            <button mat-flat-button color="primary" type="submit" [disabled]="userForm.invalid || saving">Create User</button>
+          </div>
+        </div>
+      </form>
+
+      <form *ngIf="drawerMode === 'reset-password'" [formGroup]="resetPasswordForm" (ngSubmit)="resetPassword()" class="admin-drawer-form">
+        <div class="admin-drawer-note">Apply a temporary password, then ask the user to rotate it after first login.</div>
+        <mat-form-field appearance="outline">
+          <mat-label>New password</mat-label>
+          <input matInput type="password" formControlName="password" />
+        </mat-form-field>
+
+        <div *ngIf="message" class="admin-drawer-message success">{{ message }}</div>
+        <div *ngIf="error" class="admin-drawer-message error">{{ error }}</div>
+
+        <div class="admin-drawer-actions">
+          <button mat-button type="button" (click)="closeDrawer()">Cancel</button>
+          <div class="admin-drawer-actions-group">
+            <button mat-flat-button color="primary" type="submit" [disabled]="resetPasswordForm.invalid">Reset Password</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </mat-drawer>
+</mat-drawer-container>

@@ -1,0 +1,118 @@
+<mat-drawer-container class="admin-drawer-layout card-stagger" autosize>
+  <mat-drawer-content>
+    <div class="widget-card list-widget">
+      <div class="manager-toolbar">
+        <div class="manager-heading">
+          <h2 class="manager-title">Existing Policies</h2>
+          <p class="manager-subtitle">Manage Bank guidance, effective dates, and policy activation.</p>
+        </div>
+        <button mat-flat-button color="primary" class="drawer-launch" type="button" (click)="openCreateDrawer()">
+          <mat-icon>note_add</mat-icon>
+          New Policy
+        </button>
+      </div>
+
+      <div class="widget-content">
+        <div *ngIf="policyMessage" class="form-message success table-message">{{ policyMessage }}</div>
+        <div *ngIf="policyError" class="form-message error table-message"><span>{{ policyError }}</span>
+          <button *ngIf="loadFailed" mat-stroked-button type="button" (click)="loadPolicies()" [disabled]="loading">Retry</button></div>
+
+        <ng-container *ngIf="!loading; else skeleton">
+          <ul class="policy-list" *ngIf="policies.length > 0; else emptyState">
+            <li *ngFor="let policy of policies" class="policy-item">
+              <div class="policy-info">
+                <h3 class="policy-title">{{ policy.title }}</h3>
+                <p class="policy-meta">
+                  <span>{{ policy.circularReference }}</span> -
+                  <span>Effective: {{ policy.effectiveDate | date:'mediumDate' }}</span>
+                </p>
+                <p class="policy-summary">{{ policy.summary }}</p>
+              </div>
+              <div class="policy-actions">
+                <span class="status-tag" [class.active]="policy.active">
+                  {{ policy.active ? 'Active' : 'Inactive' }}
+                </span>
+                <button mat-stroked-button (click)="editPolicy(policy)">Edit</button>
+                <button mat-stroked-button [color]="policy.active ? 'warn' : 'primary'" (click)="togglePolicyActive(policy)">
+                  {{ policy.active ? 'Deactivate' : 'Activate' }}
+                </button>
+              </div>
+            </li>
+          </ul>
+        </ng-container>
+
+        <ng-template #skeleton>
+          <div class="skeleton-list">
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+          </div>
+        </ng-template>
+
+        <ng-template #emptyState>
+          <div class="empty-state" *ngIf="!loadFailed">
+            <mat-icon class="empty-state-icon">policy</mat-icon>
+            <h3 class="empty-state-title">No Policies Yet</h3>
+            <p class="empty-state-message">Create a bank policy to start building training content.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </mat-drawer-content>
+
+  <mat-drawer class="admin-drawer-panel" position="end" mode="over" [opened]="drawerOpen" (closedStart)="closeDrawer()">
+    <div class="admin-drawer-scroll">
+      <div class="admin-drawer-header">
+        <div class="admin-drawer-overline">
+          <mat-icon>policy</mat-icon>
+          <span>{{ editingPolicyId ? 'Policy Update' : 'Policy Draft' }}</span>
+        </div>
+        <h2 class="admin-drawer-title">{{ editingPolicyId ? 'Edit Policy' : 'Create Policy' }}</h2>
+        <p class="admin-drawer-subtitle">Capture the policy record, reference, summary, and key controls in one place.</p>
+      </div>
+
+      <form [formGroup]="policyForm" (ngSubmit)="savePolicy()" class="admin-drawer-form">
+        <div class="admin-drawer-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Title</mat-label>
+            <input matInput formControlName="title" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Circular Reference</mat-label>
+            <input matInput formControlName="circularReference" />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Effective Date</mat-label>
+          <input matInput [matDatepicker]="effectiveDatePicker" formControlName="effectiveDate" placeholder="Select effective date" />
+          <mat-datepicker-toggle matIconSuffix [for]="effectiveDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #effectiveDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Summary</mat-label>
+          <textarea matInput formControlName="summary" rows="3"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Key Requirements</mat-label>
+          <textarea matInput formControlName="keyRequirements" rows="4"></textarea>
+        </mat-form-field>
+
+        <mat-checkbox formControlName="active" class="form-checkbox">Policy is Active</mat-checkbox>
+        <div class="admin-drawer-note">Only active policies can be attached to newly created quizzes.</div>
+        <div *ngIf="policyMessage" class="admin-drawer-message success">{{ policyMessage }}</div>
+        <div *ngIf="policyError" class="admin-drawer-message error">{{ policyError }}</div>
+
+        <div class="admin-drawer-actions">
+          <button mat-button type="button" (click)="closeDrawer()">Cancel</button>
+          <div class="admin-drawer-actions-group">
+            <button mat-flat-button color="primary" type="submit" [disabled]="policyForm.invalid || savingPolicy">
+              {{ editingPolicyId ? 'Update Policy' : 'Create Policy' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </mat-drawer>
+</mat-drawer-container>

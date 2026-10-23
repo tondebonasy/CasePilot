@@ -1,0 +1,75 @@
+
+<header class="page-header">
+  <div class="page-header__content">
+    <div class="page-header__badge">
+      <mat-icon>admin_panel_settings</mat-icon>
+    </div>
+    <div>
+      <h1 class="page-title">Admin Settings</h1>
+      <p class="page-subtitle">Manage system-wide rules for Service Level Agreements (SLAs), Bank policies, and training content.</p>
+    </div>
+  </div>
+</header>
+
+
+<mat-tab-group animationDuration="0ms" mat-stretch-tabs="false" mat-align-tabs="start">
+
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">timer</mat-icon>
+      <span>SLA Rules</span>
+    </ng-template>
+    <div class="tab-content">
+
+      <app-sla-manager></app-sla-manager>
+    </div>
+  </mat-tab>
+
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">policy</mat-icon>
+      <span>Policies</span>
+    </ng-template>
+    <div class="tab-content">
+
+      <app-policy-manager></app-policy-manager>
+    </div>
+  </mat-tab>
+
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">quiz</mat-icon>
+      <span>Quizzes</span>
+    </ng-template>
+    <div class="tab-content">
+
+      <app-quiz-manager></app-quiz-manager>
+    </div>
+  </mat-tab>
+
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">group</mat-icon>
+      <span>Users</span>
+    </ng-template>
+    <div class="tab-content">
+      <app-admin-users></app-admin-users>
+    </div>
+  </mat-tab>
+
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">history</mat-icon>
+      <span>Audit Log</span>
+    </ng-template>
+    <div class="tab-content">
+      <app-admin-audit-log></app-admin-audit-log>
+    </div>
+  </mat-tab>
+
+</mat-tab-group>
